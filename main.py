@@ -1,30 +1,29 @@
 import asyncio
 import logging
+import os
 from aiogram import Bot
 from aiogram import Dispatcher
 from aiogram import types
-import os
-
 from aiogram.filters import CommandStart
 from dotenv import load_dotenv
 
 load_dotenv()
-
 bot = Bot(token=os.getenv("BOT_TOKEN"))
 dp = Dispatcher()
 
 
 @dp.message(CommandStart())
 async def handle_start(message: types.Message):
-    await message.answer(f"Hello, {message.from_user.full_name}. Let's begin!")
+    user_username = message.from_user.username
+    await message.answer(f"Hi, {user_username}! Welcome to your bot!")
 
 
 @dp.message()
-async def answer_as_echo(message: types.Message):
+async def message_catcher(message: types.Message):
     try:
         await message.send_copy(chat_id=message.chat.id)
-    except Exception:
-        await message.answer("Unsupported media type...")
+    except Exception as e:
+        logging.error(f"Error sending message copy wrong file type: {e}")
 
 
 async def main():
